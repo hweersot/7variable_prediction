@@ -37,6 +37,7 @@ def main():
     # here you train your model
     y,result=trainer.test()
     cnt=0
+    print(result[0])
     for i in range(len(y)):
         if(abs(y[i]-float(result[0][i]))/y[i]<=0.1):
             cnt+=1

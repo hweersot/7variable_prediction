@@ -33,7 +33,7 @@ def csv_read(csv_name='bundang_ratio_ver.csv',encoding=None):
     raw_data=raw_data[raw_data.apt_num!=0]
     raw_data=raw_data[raw_data.price_num!=0]
     raw_data=raw_data[raw_data.psycho_num!=0]
-    raw.tail(0)
+    scaler = MinMaxScaler(feature_range=(0, 1))
     data=raw_data[['date_num','built','apt_num','psycho_num','price_num','floor_ratio','scale_ratio']]
     labels=raw_data[['ppa']]
     return data,labels
@@ -45,9 +45,7 @@ class DataGenerator:
         # load data here
         inn,y=csv_read(r'C:\Users\00001234\mlp10\data_loader\bundang_ratio_ver.csv',encoding='Ansi')
         
-        scaler = MinMaxScaler(feature_range=(0, 1))
-        inn = scaler.fit_transform(inn.values)
-        self.input = np.array(inn)
+        self.input = np.array(inn.values)
         self.y = np.array(y.values)
 
 
@@ -58,12 +56,4 @@ class DataGenerator:
         yield self.input[idx], self.y[idx]
 
     def get_full_dataset(self):
-        print(self.input.shape)
-        print(self.y.shape)
         return self.input, self.y
-
-
-00,0,,0,1,0,,4,1,3,8,.
-
-
-1 2 3 4 5 8 7 6
