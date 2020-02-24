@@ -29,10 +29,13 @@ class mlp(BaseModel):
         #tf.name_scope는 이름 설정에 관여하는 함수이다.
         #아래의 설정된 cost,result 등의 텐서들은 loss라는 카테고리 안에 속하게 되고 후에 호출이나 가시화를 할때 loss로 호출,분류가 가능하다
         with tf.name_scope("loss"):
-            #본 모델의 비용함수는 실제값과 예측값 간의 RMSE 결과이다.
+            #본 모델의 비용함수 cost는 실제값과 예측값 간의 RMSE 결과이다.
             self.cost = tf.reduce_mean(tf.square(d4-self.y))
+            #update_ops에 필요한 key들을 불러와 저장
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+            #train_step은 변수가 아닌 연산이며 실행 시 update_ops가 자동으로 같이 실행된다
             with tf.control_dependencies(update_ops):
+                #train_step 연산은 adamoptimizer 방법을 사용해 cost연산값을 최소화 시키는 방향으로 미분값*learning_rate가 저장됨
                 self.train_step = tf.train.AdamOptimizer(self.config.learning_rate).minimize(self.cost,
                                                                                          global_step=self.global_step_tensor)
 
@@ -42,12 +45,14 @@ class mlp(BaseModel):
 #                self.train_step = tf.train.AdamOptimizer(learning_rate).minimize(self.cost,
 #                                                                                         global_step=self.global_step_tensor)
 
-            correct_prediction = tf.reduce_mean(tf.square(d4-self.y))
+            #결과값 저장
             self.result= d4
+            #일반적으로 loss_function과 accuracy는 계산 방법이 다르나 accuracy는 따로 계산하였기에 아래는 에러방지만을 위해 작성
+            correct_prediction = tf.reduce_mean(tf.square(d4-self.y))
             self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 
     def init_saver(self):
-        # here you initialize the tensorflow saver that will be used in saving the checkpoints.
+        # 시간당 최대 저장횟수 지정 후 saver 객체 생성
         self.saver = tf.train.Saver(max_to_keep=self.config.max_to_keep)
 
